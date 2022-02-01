@@ -117,15 +117,14 @@ class Swimming(Training):
         return swimming_speed
 
     def get_spent_calories(self) -> float:
-        swimming_calories = (
-                (self.get_mean_speed() + self.CONST_SWIM_1_1)
-                * self.CONST_SWIM_2 * self.weight
-        )
+        swimming_calories = ((self.get_mean_speed() + self.CONST_SWIM_1_1)
+                             * self.CONST_SWIM_2 * self.weight)
         return swimming_calories
 
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
     # словарь, в котором сопоставляются коды тренировок и классы
+
     training_dict: dict[str, Training] = dict(SWM=Swimming,
                                               RUN=Running,
                                               WLK=SportsWalking)
