@@ -52,8 +52,11 @@ class Training:
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
-        return __init___(self.__class__.__name__, self.duration, self.get_distance(), self.get_mean_speed(),
-                         self.get_spent_calories())
+        return self.__init__(self.__class__.__name__,
+                             self.duration,
+                             self.get_distance(),
+                             self.get_mean_speed(),
+                             self.get_spent_calories())
 
 
 class Running(Training):
@@ -120,11 +123,12 @@ class Swimming(Training):
         )
         return swimming_calories
 
-
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
     # словарь, в котором сопоставляются коды тренировок и классы
-    training_dict: dict[str, Training] = dict(SWM=Swimming, RUN=Running, WLK=SportsWalking)
+    training_dict: dict[str, Training] = dict(SWM=Swimming,
+                                              RUN=Running,
+                                              WLK=SportsWalking)
 
     if workout_type in training_dict:
         training_name = training_dict[workout_type](*data)
