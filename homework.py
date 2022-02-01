@@ -121,6 +121,7 @@ class Swimming(Training):
                              * self.CONST_SWIM_2 * self.weight)
         return swimming_calories
 
+
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
     # словарь, в котором сопоставляются коды тренировок и классы
