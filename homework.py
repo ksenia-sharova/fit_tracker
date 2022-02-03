@@ -73,7 +73,8 @@ class Running(Training):
 
     def get_spent_calories(self) -> float:
         running_calories = ((self.CONST_RUN_MULTIPLIER * self.get_mean_speed()
-                             - self.CONST_RUN_DEDUCTIBLE) * self.weight / self.M_IN_KM
+                             - self.CONST_RUN_DEDUCTIBLE) * self.weight
+                            / self.M_IN_KM
                             * self.duration * self.HOUR_MIN)
         return running_calories
 
@@ -130,7 +131,9 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: List[int]) -> Training:
     """Прочитать данные полученные от датчиков."""
-    training_vocabulary: dict[str, Type[Training]] = dict(SWM=Swimming, RUN=Running, WLK=SportsWalking)
+    training_vocabulary: dict[str, Type[Training]] = dict(SWM=Swimming,
+                                                          RUN=Running,
+                                                          WLK=SportsWalking)
 
     if workout_type in training_vocabulary:
         training_name = training_vocabulary[workout_type](*data)
