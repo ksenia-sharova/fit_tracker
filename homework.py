@@ -1,3 +1,7 @@
+from abc import abstractmethod
+from typing import Type, List
+
+
 class InfoMessage:
     """Информационное сообщение о тренировке."""
 
@@ -24,13 +28,14 @@ class InfoMessage:
 
 class Training:
     """Базовый класс тренировки."""
-    LEN_STEP: float = 0.65  # длина шага в метрах
-    M_IN_KM: int = 1000  # для перевода значений из м в км
+    LEN_STEP: float = 0.65
+    M_IN_KM: int = 1000
+    HOUR_MIN: int = 60
 
     def __init__(self,
-                 action: int,  # основное действие во время тренировки
-                 duration: float,  # длительность тренировки
-                 weight: float,  # вес спортсмена
+                 action: int,
+                 duration: float,
+                 weight: float,
                  ) -> None:
         self.action = action
         self.duration = duration
@@ -46,10 +51,10 @@ class Training:
         mean_speed = self.get_distance() / self.duration
         return mean_speed
 
+    @abstractmethod
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-
-    pass
+        raise NotImplementedError("Необходимо переопределить метод")
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -63,21 +68,20 @@ class Training:
 
 class Running(Training):
     """Тренировка: бег."""
-    CONST_RUN_18: int = 18  # константы для расчета потраченных ккал
-    CONST_RUN_20: int = 20
-    HOUR_MIN: int = 60
+    CONST_RUN_MULTIPLIER: int = 18
+    CONST_RUN_DEDUCTIBLE: int = 20
 
     def get_spent_calories(self) -> float:
-        running_calories = ((self.CONST_RUN_18 * self.get_mean_speed()
-                             - self.CONST_RUN_20) * self.weight / self.M_IN_KM
+        running_calories = ((self.CONST_RUN_MULTIPLIER * self.get_mean_speed()
+                             - self.CONST_RUN_DEDUCTIBLE) * self.weight / self.M_IN_KM
                             * self.duration * self.HOUR_MIN)
         return running_calories
 
 
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
-    CONST_WALK_035: float = 0.035  # константы для расчета потраченных ккал
-    CONST_WALK_029: float = 0.029
+    CONST_WALK_MULTIPLIER_X: float = 0.035
+    CONST_WALK_MULTIPLIER_Y: float = 0.029
     HOUR_MIN: int = 60
 
     def __init__(self,
@@ -89,9 +93,9 @@ class SportsWalking(Training):
         self.height = height
 
     def get_spent_calories(self) -> float:
-        walking_calories = ((self.CONST_WALK_035 * self.weight
+        walking_calories = ((self.CONST_WALK_MULTIPLIER_X * self.weight
                              + (self.get_mean_speed() ** 2 // self.height)
-                             * self.CONST_WALK_029 * self.weight)
+                             * self.CONST_WALK_MULTIPLIER_Y * self.weight)
                             * self.duration * self.HOUR_MIN)
         return walking_calories
 
@@ -99,9 +103,9 @@ class SportsWalking(Training):
 class Swimming(Training):
     """Тренировка: плавание."""
 
-    LEN_STEP: float = 1.38  # длина гребка при плавании в м
-    CONST_SWIM_1_1: float = 1.1  # константы для расчета потраченных ккал
-    CONST_SWIM_2: float = 2
+    LEN_STEP: float = 1.38
+    CONST_SWIM_TERM: float = 1.1
+    CONST_SWIM_MULTIPLIER: float = 2
 
     def __init__(self,
                  action: int,
@@ -119,27 +123,26 @@ class Swimming(Training):
         return swimming_speed
 
     def get_spent_calories(self) -> float:
-        swimming_calories = ((self.get_mean_speed() + self.CONST_SWIM_1_1)
-                             * self.CONST_SWIM_2 * self.weight)
+        swimming_calories = ((self.get_mean_speed() + self.CONST_SWIM_TERM)
+                             * self.CONST_SWIM_MULTIPLIER * self.weight)
         return swimming_calories
 
 
-def read_package(workout_type: str, data: list) -> Training:
+def read_package(workout_type: str, data: List[int]) -> Training:
     """Прочитать данные полученные от датчиков."""
-    # словарь, в котором сопоставляются коды тренировок и классы
-    training_dict: dict[str, Training] = {'SWM': Swimming,
-                                          'RUN': Running,
-                                          'WLK': SportsWalking}
+    training_vocabulary: dict[str, Type[Training]] = dict(SWM=Swimming, RUN=Running, WLK=SportsWalking)
 
-    if workout_type in training_dict:
-        training_name = training_dict[workout_type](*data)
+    if workout_type in training_vocabulary:
+        training_name = training_vocabulary[workout_type](*data)
         return training_name
+    else:
+        raise ValueError("Введено неверное значение")
 
 
 def main(training: Training) -> None:
     """Главная функция."""
     info = training.show_training_info()
-    return print(info.get_message())
+    print(info.get_message())
 
 
 if __name__ == '__main__':
