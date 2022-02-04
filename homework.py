@@ -83,7 +83,6 @@ class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
     CONST_WALK_MULTIPLIER_X: float = 0.035
     CONST_WALK_MULTIPLIER_Y: float = 0.029
-    HOUR_MIN: int = 60
 
     def __init__(self,
                  action: int,
@@ -138,8 +137,7 @@ def read_package(workout_type: str, data: List[int]) -> Training:
     if workout_type in training_vocabulary:
         training_name = training_vocabulary[workout_type](*data)
         return training_name
-    else:
-        raise ValueError("Введено неверное значение")
+    raise ValueError("Введено неверное значение")
 
 
 def main(training: Training) -> None:
